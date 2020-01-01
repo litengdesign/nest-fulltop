@@ -1,39 +1,26 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserService } from '../user/user.service';
-import { LoginDto } from './auth.dto';
-import { JwtPayload } from './auth.interface';
+
+import { Injectable } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
     constructor(
-        private readonly userService: UserService,
-        private readonly jwtService: JwtService
+        private readonly usersService: UsersService,
+        private readonly jwtService: JwtService,
     ) { }
-
-    async login(data: LoginDto) {
-        const { name, password } = data;
-        const entity = await this.userService.findByName(name);
-
-        if (!entity) {
-            throw new UnauthorizedException('用户名不存在');
+    async validateUser(username: string, pass: string): Promise<any> {
+        const user = await this.usersService.findOne(username);
+        if (user && user.password === pass) {
+            const { password, ...result } = user;
+            return result;
         }
-
-        if (!(await entity.comparePassword(password))) {
-            throw new UnauthorizedException('密码不匹配。');
-        }
-
-        const { id } = entity;
-        const payload = { id, name };
-        const token = this.signToken(payload);
-
-        return {
-            ...payload,
-            token
-        }
+        return null;
     }
-
-    signToken(data: JwtPayload) {
-        return this.jwtService.sign(data);
+    async login(user: any) {
+        const payload = { username: user.username, sub: user.userId };
+        return {
+            access_token: this.jwtService.sign(payload),
+        };
     }
 }
