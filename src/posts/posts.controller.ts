@@ -1,8 +1,7 @@
 import { Controller, Get, Post, Body, Query, Param, Put, Delete, Inject } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { Posts} from '../models/posts'
 import { InjectModel } from 'nestjs-typegoose';
-import {Post as PostSchma} from './post.model'
+import { Post as PostSchma} from './post.model'
 
 @ApiTags('文章管理')
 
@@ -20,7 +19,7 @@ export class PostsController {
 
     @ApiOperation({summary:'创建文章'})
     @Post()
-    async create(@Body() createPost: Posts){
+    async create(@Body() createPost: PostSchma){
         await this.postModel.create(createPost)
         return {
             success:true
@@ -35,7 +34,7 @@ export class PostsController {
 
     @ApiOperation({summary:'编辑文章'})
     @Put(":id")
-    async updated(@Param("id") id: string, @Body() updatePost: Posts) {
+    async updated(@Param("id") id: string, @Body() updatePost: PostSchma) {
         await this.postModel.findByIdAndUpdate(id, updatePost)
         return {
             success: true

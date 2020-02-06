@@ -1,4 +1,5 @@
 import { Controller, Get, Request, Post, UseGuards, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -10,6 +11,7 @@ export class AuthController {
     ) { }
 
     // 登陆
+    @ApiOperation({ summary: '用户登录' })
     @UseGuards(AuthGuard('local'))
     @Post('login')
     async login(@Req() req) {
